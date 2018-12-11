@@ -2,6 +2,7 @@ Procedimento de instalação nos PCs da UFLA
 
 1) executar no terminal: python build/get-pip.py --user
 2) executar no terminal: ~/.local/bin/pip install networkx==2.2 --user
+3) instalar o jupyter: ~/.local/bin/pip install jupyter --user
 
 Procedimentos para instalação em PC 
 
