@@ -1,0 +1,9 @@
+1) Dividir sub-regiões a partir dos centros de distribuições. 
+Cada casa cadastrada vai encontrar o centro de distribuição mais próximo a que ela pertença;
+
+2) Descobrir as rotas das sub-regiões a partir de um TSP-Inserção mais próxima, com critérios 
+categorizados as casas dos clientes que realizaram pedidos, considerando o valor do pedido 
+e o peso em m^3 da mercadoria de entrega;
+
+3) Definir os carros para entregas em suas sub-regiões, a partir da demanda dos clientes 
+dentro delas;
