@@ -1,4 +1,7 @@
 from math import ceil
+from math import hypot
+
+
 class Cliente(object):
     def __init__(self, v, valor, qtdPacotes, coordX, coordY):
         self.volume = v*qtdPacotes*100
@@ -12,7 +15,7 @@ class Cliente(object):
         return self.__coordX
 
     def getY(self):
-        return self.__coordY
+        return self.__coordY 
 
     def __repr__(self):
         if self.centro:
