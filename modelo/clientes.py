@@ -1,7 +1,7 @@
 from math import ceil
 class Cliente(object):
     def __init__(self, v, valor, qtdPacotes, coordX, coordY):
-        self.volume = v
+        self.volume = v*qtdPacotes*100
         self.__valor = valor
         self.pacotes = qtdPacotes
         self.__coordX = coordX
