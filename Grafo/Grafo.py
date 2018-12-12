@@ -1,18 +1,11 @@
 import networkx as nx
 
-def TSP ():
-    G = nx.Graph()
+def TSP (G):
     listaDeVertices = []
     verticeInicial = None
     i = 0
-    for u,v in G.adjacency_iter():
-        G[u]["visitado"] = False
-        G[u][v]["caminho"] = False
-
-    fun (G,listaDeVisitados)
-
     for vertice in G.nodes_iter():
-        listaDeVertices[i].append(vertice)
+        listaDeVertices.append(vertice)
         if i == 0:
             verticeInicial = vertice
         i =+ 1
@@ -20,37 +13,73 @@ def TSP ():
     listaDeVisitados = [listaDeVertices[0]]
 
     while len(listaDeVisitados) != len(listaDeVertices):
-        listaDeVisitados =  fun (G,listaDeVisitados
+        G,listaDeVisitados =  fun (G,listaDeVisitados)
+        soma = 0
+        for u,v in G.edges_iter():
+            if(G[u][v]["caminho"] == True):
+                soma += G[u][v]["distancia"]
+                print (u,v)
+        print (soma)
+    return G
 
 def fun (G,listaVerticesVisitadas):
+
     melhorDistancia = float("inf")
-    melhorAresta = (-1,1)
-    for u in listaDeVisitados:
-        for verticeAdjacente in G.edges_iter(u[0]):
-            if G[u][verticeAdjacente]["distancia"] < melhorDistancia and G[verticeAdjacente]["visitado"] = False :
+    melhorAresta = (-1,-1)
+    for u in listaVerticesVisitadas:
+        for x,verticeAdjacente in G.edges_iter(u):
+            if G[u][verticeAdjacente]["distancia"] < melhorDistancia and G.node[verticeAdjacente]["visitado"] == False and verticeAdjacente not in listaVerticesVisitadas :
                 melhorDistancia = G[u][verticeAdjacente]["distancia"]
                 melhorAresta = (u,verticeAdjacente)
-
+    
     if len(listaVerticesVisitadas) == 1:
         G[melhorAresta[0]][melhorAresta[1]]["caminho"] = True
     elif len(listaVerticesVisitadas) == 2:
-        G[melhorAresta[0]][melhorAresta[1]]["caminho"] = True
-        G[melhorAresta[1]][melhorAresta[listaVerticesVisitadas[1]]]["caminho"] = True
+        G[melhorAresta[1]][listaVerticesVisitadas[0]]["caminho"] = True
+        G[melhorAresta[1]][listaVerticesVisitadas[1]]["caminho"] = True
     else:
         novaMelhorDistancia = float("inf")
-        for u in listaDeVisitados:
-        for verticeAdjacente in G.edges_iter(u[0]):
-            if G[u][verticeAdjacente]["distancia"] < melhorDistancia and G[verticeAdjacente]["visitado"] = True and melhorAresta[0] != u :
-                novaMelhorDistancia = G[u][verticeAdjacente]["distancia"]
-                novaMelhorAresta = (u,verticeAdjacente)
+        novaMelhorAresta = (-1,-1)
+        for u in listaVerticesVisitadas:
+            for x,verticeAdjacente in G.edges_iter(u):
+                if G[u][verticeAdjacente]["distancia"] < novaMelhorDistancia and melhorAresta[0] != u and verticeAdjacente == melhorAresta[1] :
+                    novaMelhorDistancia = G[u][verticeAdjacente]["distancia"]
+                    novaMelhorAresta = (u,verticeAdjacente)
+
 
         G[melhorAresta[0]][melhorAresta[1]]["caminho"] = True
-        G[melhorAresta[0]][novaMelhorAresta[1]]["caminho"] = False
+        G[melhorAresta[0]][novaMelhorAresta[0]]["caminho"] = False
         G[novaMelhorAresta[0]][novaMelhorAresta[1]]["caminho"] = True
     listaVerticesVisitadas.append(melhorAresta[1])
-    return listaVerticesVisitadas
-        
+    return G,listaVerticesVisitadas
 
+def teste ():
+    G = nx.Graph()
+    G.add_nodes_from([1,2,3,4,5],visitado = False)
+    G.add_edges_from([(1,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,4),(3,5),(4,5)],caminho = False)
+    G[1][2]["distancia"] = 2
+    G[1][3]["distancia"] = 6
+    G[1][4]["distancia"] = 4
+    G[1][5]["distancia"] = 1
+    G[2][3]["distancia"] = 7
+    G[2][4]["distancia"] = 3
+    G[2][5]["distancia"] = 5
+    G[3][4]["distancia"] = 8
+    G[3][5]["distancia"] = 4
+    G[4][5]["distancia"] = 2
+
+    
+
+    G = TSP(G)
+    print ("resultado")
+    soma = 0
+    for u,v in G.edges_iter():
+        if(G[u][v]["caminho"] == True):
+            soma += G[u][v]["distancia"]
+            print (u,v)
+    print (soma)
+
+teste()
         
 
 
