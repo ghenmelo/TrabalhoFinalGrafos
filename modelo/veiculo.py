@@ -24,9 +24,13 @@ class Veiculo(object):
         self.ph = ph
         self.pkm = pkm
         self.pf = pf
+        self.custoBeneficio
         
         
     def imprime(self):
         print(self.V, self.P, self.Nv, self.vf, self.vd, self.tc, self.td, self.ph, self.pkm, self.pf)
+    def calculaCustoBeneficio(self):
+        self.custoBeneficio = (self.ph+self.pkm+self.pf) / (self.P + self.V)
+        
 
     

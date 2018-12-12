@@ -1,6 +1,7 @@
 import networkx as nx
+import veiculo from modelo
 
-def TSP (G):
+def TSP (G,veiculo):
     listaDeVertices = []
     verticeInicial = None
     i = 0
@@ -11,15 +12,15 @@ def TSP (G):
         i =+ 1
 
     listaDeVisitados = [listaDeVertices[0]]
-
-    while len(listaDeVisitados) != len(listaDeVertices):
+    soma = 0
+    while len(listaDeVisitados) != len(listaDeVertices) and soma <= veiculo.V and somaDinheiro <= veiculo.P:
         G,listaDeVisitados =  fun (G,listaDeVisitados)
-        soma = 0
         for u,v in G.edges_iter():
             if(G[u][v]["caminho"] == True):
                 soma += G[u][v]["distancia"]
-                print (u,v)
-        print (soma)
+    for u,v in G.adjacency_iter():
+        if (G[u][v]["caminho"] == True):
+            G.remove_nodes_from([u,v])
     return G
 
 def fun (G,listaVerticesVisitadas):
@@ -53,7 +54,7 @@ def fun (G,listaVerticesVisitadas):
     listaVerticesVisitadas.append(melhorAresta[1])
     return G,listaVerticesVisitadas
 
-def teste ():
+def teste (veiculos):
     G = nx.Graph()
     G.add_nodes_from([1,2,3,4,5],visitado = False)
     G.add_edges_from([(1,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,4),(3,5),(4,5)],caminho = False)
@@ -67,17 +68,31 @@ def teste ():
     G[3][4]["distancia"] = 8
     G[3][5]["distancia"] = 4
     G[4][5]["distancia"] = 2
+    N = nx.Graph()
+    N = G
+    caminhos = []
+    melhorVeiculo = veiculos[0]
+    while N.size() != 0:
+        for veiculo in veiculos:
+            if veiculo.custoBeneficio > melhorVeiculo.custoBeneficio:
+                if veiculo.Nv != 0 :
+                   melhorVeiculo = veiculo
+        TSP(G,melhorVeiculo)
+        # Falta retorna os caminhos 
+        #NAO ESTA COMPLETO
+        veiculos[veiculos.index(melhorVeiculo)].Nv -= veiculos[veiculos.index(melhorVeiculo)].Nv
 
-    
 
-    G = TSP(G)
-    print ("resultado")
-    soma = 0
-    for u,v in G.edges_iter():
-        if(G[u][v]["caminho"] == True):
-            soma += G[u][v]["distancia"]
-            print (u,v)
-    print (soma)
+                
+        
+
+    # print ("resultado")
+    #     soma = 0
+    #     for u,v in G.edges_iter():
+    #         if(G[u][v]["caminho"] == True):
+    #             soma += G[u][v]["distancia"]
+    #             print (u,v)
+    #     print (soma)
 
 teste()
         
