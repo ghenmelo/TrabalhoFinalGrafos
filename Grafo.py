@@ -1,6 +1,7 @@
 import networkx as nx
 from modelo.veiculo import Veiculo
 import random
+#PRECISA COLOCAR A QUESTAO DO TEMPO QUE O VEICULO CIRCULA
 
 def TSP (G,veiculo):
     listaDeVertices = []
@@ -10,14 +11,19 @@ def TSP (G,veiculo):
     listaDeVisitados = [listaDeVertices[0]]
     somaVolume = 0
     somaDinheiro = 0
+    #temporario foi criada com o intuito de salva a ultima trajetória válida que o veiculo pode fazer
+    temp = nx.Graph()
+
     while len(listaDeVisitados) != len(listaDeVertices) and somaVolume <= veiculo.V and somaDinheiro <= veiculo.P:
+        temp = G
         G,listaDeVisitados =  fun (G,listaDeVisitados)
         for i in listaDeVisitados:
             somaDinheiro += G.node[i]["dinheiro"]
             somaVolume += G.node[i]["volume"]
+
+    G = temp
     verticeInicial = listaDeVisitados[0]
-    temp = nx.Graph()
-    temp = G   
+    #Conjunto
     caminho = {listaDeVisitados[0]}
     for u,v in temp.edges():
         if G[u][v]["caminho"] == True:
@@ -28,6 +34,7 @@ def TSP (G,veiculo):
             G.remove_node(i)
     if (len(caminho) == 1):
         return temp,caminho
+    print ("saiu")
     return G,caminho
 
 def fun (G,listaVerticesVisitadas):
@@ -80,11 +87,11 @@ def teste (veiculos):
     G.node[4]["dinheiro"] = 150
     G.node[5]["dinheiro"] = 50
 
-    G.node[1]["volume"] = 10
-    G.node[2]["volume"] = 20
-    G.node[3]["volume"] = 30
-    G.node[4]["volume"] = 15
-    G.node[5]["volume"] = 5
+    G.node[1]["volume"] = 0.010
+    G.node[2]["volume"] = 0.020
+    G.node[3]["volume"] = 0.30
+    G.node[4]["volume"] = 0.015
+    G.node[5]["volume"] = 1
     N = nx.Graph()
     N = G
     caminhos = []
@@ -92,18 +99,25 @@ def teste (veiculos):
     for veiculo in veiculos:
         melhoresVeiculos.append(veiculo)
     melhoresVeiculos.sort(reverse=True, key=lambda veiculo:veiculo.calculaCustoBeneficio())
-    i = 0
     while N.size() != 0:
-        caminhoAtual = []
-        G,caminhoAtual = TSP(G,melhoresVeiculos[0])
         k = 0
+        for i in range (len(melhoresVeiculos)):
+            if (melhoresVeiculos[i].Nv > 0):
+                k = i
+                break
+        caminhoAtual = []
+        if melhoresVeiculos[k].Nv > 0:
+            G,caminhoAtual = TSP(G,melhoresVeiculos[0])
+        
         while len(caminhoAtual) == 1 :
+            print ("a")
             k = 1
-            G,caminhoAtual = TSP(G,melhoresVeiculos[k])
+            if melhoresVeiculos[k].Nv > 0:
+                G,caminhoAtual = TSP(G,melhoresVeiculos[k])
             k += 1
             if k == 5:
                 raise Exception("Não foi possível resolver")
-        print (melhoresVeiculos[k].Nv)
+
         caminhos.append({i+1:(caminhoAtual,melhoresVeiculos[k].Nv)})
         i += 1
         veiculos[veiculos.index(melhoresVeiculos[k])].Nv -= 1
@@ -152,7 +166,7 @@ veiculos[2].pf = random.randint(60,120)
 # Tipo 3: Motocicleta
 veiculos[3].V = random.uniform(0.02,0.04)
 veiculos[3].P = random.randint(1000,5000)
-veiculos[3].Nv = random.randint(20,30)
+veiculos[3].Nv = random.randint(1,1)
 veiculos[3].td = random.uniform(0.02, 0.04)
 veiculos[3].ph = random.randint(30,60)
 veiculos[3].pkm = random.randint(1,2)
@@ -165,8 +179,10 @@ veiculos[4].td = random.uniform(0.04, 0.08)
 veiculos[4].ph = 0
 veiculos[4].pkm = random.randint(2,4)
 veiculos[4].pf = 0
-# for i in veiculos:
-#     print(i.calculaCustoBeneficio())
+for i in veiculos:
+    print(i.calculaCustoBeneficio())
+for i in veiculos:
+    print(i.Nv)
 teste(veiculos)
 
 
