@@ -1,5 +1,5 @@
 import networkx as nx
-import veiculo from modelo
+from modelo.veiculo import Veiculo
 
 def TSP (G,veiculo):
     listaDeVertices = []
@@ -12,16 +12,24 @@ def TSP (G,veiculo):
         i =+ 1
 
     listaDeVisitados = [listaDeVertices[0]]
-    soma = 0
-    while len(listaDeVisitados) != len(listaDeVertices) and soma <= veiculo.V and somaDinheiro <= veiculo.P:
+    somaVolume = 0
+    somaDinheiro = 0
+    caminho = [listaDeVertices[0]]
+    while len(listaDeVisitados) != len(listaDeVertices) and somaVolume <= veiculo.V and somaDinheiro <= veiculo.P:
         G,listaDeVisitados =  fun (G,listaDeVisitados)
-        for u,v in G.edges_iter():
-            if(G[u][v]["caminho"] == True):
-                soma += G[u][v]["distancia"]
+        for i in listaDeVisitados:
+            somaDinheiro += G[i]["dinheiro"]
+            somaVolume += G[i]["volume"]
     for u,v in G.adjacency_iter():
-        if (G[u][v]["caminho"] == True):
-            G.remove_nodes_from([u,v])
-    return G
+        if G[u][v]["caminho"] == True :
+            if u != listaDeVisitados[0]:
+                G.remove_node(u)
+                caminho.append(u)
+            if v != listaDeVisitados[0]:
+                G.remove_node(v)
+                caminho.append(v)
+    
+    return G,caminho
 
 def fun (G,listaVerticesVisitadas):
 
@@ -56,7 +64,7 @@ def fun (G,listaVerticesVisitadas):
 
 def teste (veiculos):
     G = nx.Graph()
-    G.add_nodes_from([1,2,3,4,5],visitado = False)
+    G.add_nodes_from([1,2,3,4,5],visitado = False,dinheiro = 0,volume = 0)
     G.add_edges_from([(1,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,4),(3,5),(4,5)],caminho = False)
     G[1][2]["distancia"] = 2
     G[1][3]["distancia"] = 6
@@ -68,19 +76,36 @@ def teste (veiculos):
     G[3][4]["distancia"] = 8
     G[3][5]["distancia"] = 4
     G[4][5]["distancia"] = 2
+
+    G.node[1]["dinheiro"] = 100
+    G.node[2]["dinheiro"] = 200
+    G.node[3]["dinheiro"] = 300
+    G.node[4]["dinheiro"] = 150
+    G.node[5]["dinheiro"] = 50
+
+    G.node[1]["volume"] = 10
+    G.node[2]["volume"] = 20
+    G.node[3]["volume"] = 30
+    G.node[4]["volume"] = 15
+    G.node[5]["volume"] = 5
+
     N = nx.Graph()
     N = G
     caminhos = []
+    i = 0
     melhorVeiculo = veiculos[0]
+    
     while N.size() != 0:
+        caminhoAtual = []
         for veiculo in veiculos:
-            if veiculo.custoBeneficio > melhorVeiculo.custoBeneficio:
+            if veiculo.calculaCustoBeneficio() > melhorVeiculo.calculaCustoBeneficio():
                 if veiculo.Nv != 0 :
                    melhorVeiculo = veiculo
-        TSP(G,melhorVeiculo)
-        # Falta retorna os caminhos 
-        #NAO ESTA COMPLETO
+        G,caminhoAtual = TSP(G,melhorVeiculo)
+        caminhos[i] = {i+1:caminhoAtual}
+        i += 1
         veiculos[veiculos.index(melhorVeiculo)].Nv -= veiculos[veiculos.index(melhorVeiculo)].Nv
+    return caminhos
 
 
                 
@@ -93,8 +118,8 @@ def teste (veiculos):
     #             soma += G[u][v]["distancia"]
     #             print (u,v)
     #     print (soma)
-
-teste()
+veiculos = []
+teste(veiculos)
         
 
 
