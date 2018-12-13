@@ -12,13 +12,13 @@ class Cliente(object):
         self.centro = False
 
     def getX(self):
-        return self.__coordX
+        return self.__coordX * 100
 
     def getY(self):
-        return self.__coordY 
+        return self.__coordY * 100
 
     def __repr__(self):
         if self.centro:
-            return "({0}, {1}, {2}, {3})".format(self.__coordX, self.__coordY, ceil(self.volume), self.pacotes)
+            return "({0}, {1}, {2}, {3})".format(ceil(self.__coordX), ceil(self.__coordY), ceil(self.volume), self.pacotes)
         else:    
-            return "({0}, {1})".format(self.__coordX, self.__coordY)
+            return "({0}, {1})".format(ceil(self.__coordX), ceil(self.__coordY))
