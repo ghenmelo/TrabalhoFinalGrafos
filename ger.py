@@ -26,12 +26,5 @@ G.node[3]["volume"] = 30
 G.node[4]["volume"] = 15
 G.node[5]["volume"] = 5
 
-a = ([1,2,3],veiculo)
-i = [4,2,1,3,5,6]
-i.sort()
-i.reverse()
-print(i)
-
-
-# for u,v in G.edges():
-#     print (u,v)
+a = {1,2,3,4}
+print (a)
