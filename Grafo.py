@@ -120,39 +120,58 @@ def teste (G,veiculos):
         veiculos[veiculos.index(melhoresVeiculos[k])].Nv -= 1
     print(caminhos)
 
-def criarGrafo ():
-    G = nx.Graph()
-    G.add_nodes_from([1,2,3,4,5],visitado = False,dinheiro = 0,volume = 0)
-    G.add_edges_from([(1,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,4),(3,5),(4,5)],caminho = False)
-    G[1][2]["distancia"] = 9
-    G[1][3]["distancia"] = 6
-    G[1][4]["distancia"] = 4
-    G[1][5]["distancia"] = 1
-    G[2][3]["distancia"] = 7
-    G[2][4]["distancia"] = 3
-    G[2][5]["distancia"] = 5
-    G[3][4]["distancia"] = 8
-    G[3][5]["distancia"] = 4
-    G[4][5]["distancia"] = 2
+def criarGrafo (C):
+    G=nx.Graph()
+    cont = 2
+    
+    for i in C.nodes():
+        if(i.centro == True):
+            
+            G.add_node(1,volume=i.v,valor=i.valor,numeroPacotes=i.pacotes,coordX=i.coordX,coordY=i.coordY,centro=i.centro)
+        
+        else:
+            G.add_node(cont,volume=i.v,valor=i.valor,numeroPacotes=i.pacotes,coordX=i.coordX,coordY=i.coordY,centro=i.centro)
+            cont += 1
 
-    G.node[1]["dinheiro"] = 0
-    G.node[2]["dinheiro"] = 200
-    G.node[3]["dinheiro"] = 300
-    G.node[4]["dinheiro"] = 150
-    G.node[5]["dinheiro"] = 50
+    for i in range(G.size()):
+        for j in range(i+1,G.size()):
+            for u,v in C.edges():
+                if  u.v == G.node[i]["volume"] and u.valor == G.node[i]["valor"] and u.pacotes == G.node[i]["numeroPacotes"] and u.cordX == G.node[i]["coordX"] and u.coodY == G.node[i]["coordY"] and u.centro == G.node[i]["centro"]:
+                    if  u.v == G.node[j]["volume"] and u.valor == G.node[j]["valor"] and u.pacotes == G.node[j]["numeroPacotes"] and u.cordX == G.node[j]["coordX"] and u.coodY == G.node[j]["coordY"] and u.centro == G.node[j]["centro"]:
+                        G.add_edge((i,j),distancia = C[i][j]["distancia"])
 
-    G.node[1]["numeroPacotes"]=0
-    G.node[2]["numeroPacotes"]=3
-    G.node[3]["numeroPacotes"]=2
-    G.node[4]["numeroPacotes"]=1
-    G.node[5]["numeroPacotes"]=6
+#     G = nx.Graph()
+#     G.add_nodes_from([1,2,3,4,5],visitado = False,dinheiro = 0,volume = 0)
+#     G.add_edges_from([(1,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,4),(3,5),(4,5)],caminho = False)
+#     G[1][2]["distancia"] = 9
+#     G[1][3]["distancia"] = 6
+#     G[1][4]["distancia"] = 4
+#     G[1][5]["distancia"] = 1
+#     G[2][3]["distancia"] = 7
+#     G[2][4]["distancia"] = 3
+#     G[2][5]["distancia"] = 5
+#     G[3][4]["distancia"] = 8
+#     G[3][5]["distancia"] = 4
+#     G[4][5]["distancia"] = 2
+
+#     G.node[1]["dinheiro"] = 0
+#     G.node[2]["dinheiro"] = 200
+#     G.node[3]["dinheiro"] = 300
+#     G.node[4]["dinheiro"] = 150
+#     G.node[5]["dinheiro"] = 50
+
+#     G.node[1]["numeroPacotes"]=0
+#     G.node[2]["numeroPacotes"]=3
+#     G.node[3]["numeroPacotes"]=2
+#     G.node[4]["numeroPacotes"]=1
+#     G.node[5]["numeroPacotes"]=6
     
 
-    G.node[1]["volume"] = 0
-    G.node[2]["volume"] = 2
-    G.node[3]["volume"] = 0.03
-    G.node[4]["volume"] = 1
-    G.node[5]["volume"] = 0.01 
+#     G.node[1]["volume"] = 0
+#     G.node[2]["volume"] = 2
+#     G.node[3]["volume"] = 0.03
+#     G.node[4]["volume"] = 1
+#     G.node[5]["volume"] = 0.01 
     return G       
         
 # Lista de informações sobre os veículos
