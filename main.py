@@ -218,52 +218,63 @@ grafo = nx.Graph()
 
 total = 0
 
+
 for regiao in regioes.keys():
     grafo.add_nodes_from(list(regioes[regiao].nodes()))
 
     resultado = MontaCaminhos(regioes[regiao],veiculos_melhorados[regiao])
 
     for caminho in resultado:
-        
+
+        soma_qtd_pacotes = 0
         km_percorrido = 0
         tempo_percorrido = 0
         veiculo_utilizado = None
+        distancia_ctcasa = 0
+        distancia_casact = 0
+        tempo_carregamento = 0
+        tempo_descarregamento = 0
+        tempo_total = 0
+        tempoInicial = 0
+        tempoRota = 0
 
         for rota_temp in caminho.keys():
             rota, veiculo = caminho[rota_temp]
-            
             veiculo_utilizado = veiculo
             
             for i in range(len(rota)-1):
-                if i == 0:
-                    # contar o tempo gasto no descarregamento do centro ao primeiro cliente
-                    tempo_percorrido += veiculo.tc
-                else:
-                    # contar o tempo gasto no descarregamento de cliente para cliente
-                    tempo_percorrido += veiculo.td
+                soma_qtd_pacotes += rota[i].pacotes
                 
+                valor = len(rota)-1
+
+                if i == 0:
+                    distancia_ctcasa = distancia(rota[0],rota[1])
+                elif i == valor:
+                    distancia_casact += distancia(rota[valor],rota[0])
+
                 km_percorrido += distancia(rota[i], rota[i+1])
                 grafo.add_edge(rota[i], rota[i+1], distancia=distancia(rota[i], rota[i+1]))
 
 
-        # contar o tempo gasto no descarregamento de um cliente e volta para centro
-        tempo_percorrido += veiculo_utilizado.tc
-        km_percorrido += distancia(rota[0],rota[len(rota)-1])
+        soma_qtd_pacotes += rota[len(rota)-1].pacotes
 
-        tempo_percorrido += km_percorrido / veiculo_utilizado.vd
+        tempo_carregamento += (soma_qtd_pacotes*veiculo.tc)
+        tempo_descarregamento += (soma_qtd_pacotes*veiculo.td)
+        tempoInicial = (distancia_casact + distancia_ctcasa)/veiculo_utilizado.vf 
+        tempoRota = km_percorrido/veiculo_utilizado.vd
+        tempo_total = tempo_carregamento + tempo_descarregamento + tempoInicial + tempoRota
 
         grafo.add_edge(rota[0], rota[len(rota)-1])
 
-        custo_por_km = km_percorrido * veiculo_utilizado.pkm
-        custo_por_hr = tempo_percorrido * veiculo_utilizado.ph
+        custo_por_km = (km_percorrido+distancia_casact + distancia_ctcasa) * veiculo_utilizado.pkm
+        custo_por_hr = tempo_total * veiculo_utilizado.ph
         custo_fixo = veiculo_utilizado.pf
 
         total_veiculo = custo_fixo + custo_por_hr + custo_por_km   
-        print("Tempo gasto: ", tempo_percorrido)
+        print("Tempo gasto: ", tempo_total)
         print("Rota com veículo ", veiculo_utilizado, " gastou: ", total_veiculo)
 
         total += total_veiculo
-    
 print("Total de gastos: ", total)
 
 imprime_grafo_simples(grafo, "exibicao/rotas", qtd_casas)
