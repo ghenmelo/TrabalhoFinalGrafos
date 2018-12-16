@@ -59,28 +59,28 @@
 
 # primeira classificação - considerando as distancias entre 
 # pontos
-# centros = list(regioes.keys())
-# demanda_ideal = (qtd_casas - qtd_centros) / qtd_centros
+centros = list(regioes.keys())
+demanda_ideal = (qtd_casas - qtd_centros) / qtd_centros
 
-# for centro in regioes.keys():
-#     grafo = regioes[centro]
+for centro in regioes.keys():
+    grafo = regioes[centro]
     
-#     if (len(list(grafo.neighbors(centro))) <= demanda_ideal):
-#         continue
+    if (len(list(grafo.neighbors(centro))) <= demanda_ideal):
+        continue
     
-#     for cliente in list(grafo.neighbors(centro)):
-#         centros.sort(reverse=True, key=lambda centro : distancia(centro, cliente))
+    for cliente in list(grafo.neighbors(centro)):
+        centros.sort(reverse=True, key=lambda centro : distancia(centro, cliente))
         
-#         if (len(list(regioes[centros[1]].neighbors(centros[1]))) < demanda_ideal):
-#             if (centros[1].maior_distancia * 1.2) >= distancia(cliente, centros[1]):
-#                 grafo.remove_node(cliente)
-#                 regioes[centros[1]].add_node(cliente)
-#                 regioes[centros[1]].add_edge(cliente, centros[1], distancia=distancia(centros[1], cliente))
-#         elif (len(list(regioes[centros[2]].neighbors(centros[2]))) <= demanda_ideal):
-#             if (centros[2].maior_distancia * 1.2) >= distancia(cliente, centros[2]):
-#                 grafo.remove_node(cliente)
-#                 regioes[centros[2]].add_node(cliente)
-#                 regioes[centros[2]].add_edge(cliente, centros[2], distancia=distancia(centros[2], cliente))
+        if (len(list(regioes[centros[1]].neighbors(centros[1]))) < demanda_ideal):
+            if (centros[1].maior_distancia * 1.2) >= distancia(cliente, centros[1]):
+                grafo.remove_node(cliente)
+                regioes[centros[1]].add_node(cliente)
+                regioes[centros[1]].add_edge(cliente, centros[1], distancia=distancia(centros[1], cliente))
+        elif (len(list(regioes[centros[2]].neighbors(centros[2]))) <= demanda_ideal):
+            if (centros[2].maior_distancia * 1.2) >= distancia(cliente, centros[2]):
+                grafo.remove_node(cliente)
+                regioes[centros[2]].add_node(cliente)
+                regioes[centros[2]].add_edge(cliente, centros[2], distancia=distancia(centros[2], cliente))
         
-#         if (len(list(grafo.neighbors(centro))) <= demanda_ideal):
-#             break
+        if (len(list(grafo.neighbors(centro))) <= demanda_ideal):
+            break

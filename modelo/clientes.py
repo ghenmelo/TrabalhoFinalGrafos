@@ -3,12 +3,14 @@ from math import hypot
 
 class Cliente(object):
     def __init__(self, v, valor, qtdPacotes, coordX, coordY):
-        self.volume = v*qtdPacotes*100
+        self.volume = v
         self.__valor = valor
         self.pacotes = qtdPacotes
         self.__coordX = coordX
         self.__coordY = coordY
         self.centro = False
+
+        self.soma_distancias = 0
 
     def getX(self):
         return self.__coordX  
