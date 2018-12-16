@@ -9,13 +9,10 @@ class Cliente(object):
         self.__coordX = coordX
         self.__coordY = coordY
         self.centro = False
+        self.soma_distancias = 0
 
-<<<<<<< HEAD
     def getValor(self):
         return self.__valor
-=======
-        self.soma_distancias = 0
->>>>>>> ed1c5409fd1703980235bc69357034790d86e7da
 
     def getX(self):
         return self.__coordX  

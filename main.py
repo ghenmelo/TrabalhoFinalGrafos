@@ -28,7 +28,30 @@ def ler_cliente(x, y, volume, valor, pacotes,flag):
     return Cliente(volume, valor, pacotes, x, y)
 
 def ler_veiculo(V, P, Nv, vf, vd, tc, td, ph, pkm, pf):
-    return Veiculo(V, P, Nv, vf, vd, tc, td, ph, pkm, pf) 
+    return Veiculo(V, P, Nv, vf, vd, tc, td, ph, pkm, pf)
+
+def imprime_grafo_simples(grafo, nome_arquivo, limite):
+    centros = [x for x in grafo.nodes() if x.centro is True]
+    
+    mpl.rc("axes", edgecolor="blue")
+    a.plot([x.getX() for x in centros], [x.getY() for x in centros], "bo")
+
+    mapeamento_x = []
+    mapeamento_y = []
+
+    for vertice in grafo.nodes():
+        if vertice not in centros:
+            mapeamento_x.append(cliente.getX())
+            mapeamento_y.append(cliente.getY())
+
+    a.plot(mapeamento_x, mapeamento_y, "ro")
+
+    for (u, v) in grafo.edges():
+        a.plot([u.getX(), v.getX()], [u.getY(), v.getY()], "--k")
+
+    a.axis([0, limite, 0, limite])
+    
+    a.savefig(nome_arquivo)
 
 def imprime_grafo(regioes, nome_arquivo, limite):
     a.clf()
@@ -130,87 +153,6 @@ for cliente in clientes:
 
 imprime_grafo(regioes, "exibicao/{0}sem-melhoria.png".format(nome_arquivo), qtd_casas)
 
-# # mostra as médias ideias, para volume e distância
-# media_distancia_centros = 0
-# media_volume_centros = 0
-
-# for centro in regioes.keys():
-#     qtd = len(list(regioes[centro].neighbors(centro)))
-#     media_distancia_centros += centro.soma_distancias / qtd
-#     media_volume_centros += centro.volume / qtd
-
-# media_distancia_centros /= len(list(regioes.keys()))
-# media_volume_centros /= len(list(regioes.keys()))
-
-# print("Média ideal das distâncias dos centros: ", media_distancia_centros)
-# print("Média ideal dos volumes dos centros: ", media_volume_centros)
-
-# for i in regioes.keys():
-#     grafo = regioes[i]
-#     print("Quantidade de vizinhos: ", len(list(grafo.neighbors(i))))
-# for i in regioes.keys():
-#     print("Volume: ", i.volume)
-
-volume_ideal = volume_total / qtd_centros
-
-for centro in regioes.keys():
-    if (centro.volume <= volume_ideal):
-        continue
-    
-    print("Balanceando centro com volume: ", centro.volume)
-
-    # ordena a partir dos clientes mais distantes
-    clientes = list(regioes[centro].neighbors(centro))
-    clientes.sort(reverse=True, key=lambda cliente : distancia(centro, cliente))
-    # quantidade de clientes que serão deslocados, garantidos pela taxa de 87%
-    # de melhoria das distribuições de serviços
-    qtd_melhoria = math.floor(len(clientes) * 0.90)
-    while qtd_melhoria > 0 and centro.volume > volume_ideal:
-        # pega o cliente
-        cliente = clientes.pop(0)
-        # remove esse cliente para entrega deste centro de distribuição
-        regioes[centro].remove_node(cliente)
-        
-        # atualiza o volume
-        centro.volume -= cliente.volume
-
-        possiveis_centros = list(regioes.keys())
-        possiveis_centros.remove(centro)
-
-        possiveis_centros.sort(reverse=True, key=lambda c: distancia(c, cliente))
-        
-        definiu = False
-        contador = 0
-
-        while not definiu and len(possiveis_centros) > 0 and contador < 2:
-            contador += 1
-            possivel_centro = possiveis_centros.pop(0)
-
-            if (possivel_centro.volume + cliente.volume) <= volume_ideal:
-                if (possivel_centro.maior_distancia * 1.2) >= distancia(cliente, possivel_centro):
-                    definiu = True
-                    regioes[possivel_centro].add_node(cliente)
-                    regioes[possivel_centro].add_edge(cliente, possivel_centro, distancia=distancia(possivel_centro, cliente))
-                    possivel_centro.volume += cliente.volume
-
-        # caso não seja encontrado um outro centro de distribuição que 
-        # consiga atender este cliente, ele deverá ainda ser atendido pelo
-        # centro em que já se encontrava
-        if not definiu:
-            regioes[centro].add_node(cliente)
-            regioes[centro].add_edge(cliente, centro, distancia=distancia(centro, cliente))
-            centro.volume += cliente.volume
-
-        # atualiza a quantidade de clientes que podem ser melhorados
-        qtd_melhoria -= 1
-    
-    print("Centro balanceado. Novo volume: ", centro.volume)
-    print()
-print("Volume ideal: ", volume_ideal)
-
-
-# primeira classificação - considerando as distancias entre 
-# pontos
 centros = list(regioes.keys())
 demanda_ideal = (qtd_casas - qtd_centros) / qtd_centros
 
@@ -237,53 +179,6 @@ for centro in regioes.keys():
         if (len(list(grafo.neighbors(centro))) <= demanda_ideal):
             break
 
-# regiões que estão desbalanceadas por demanda
-# demanda_ideal = (qtd_casas-qtd_centros) / qtd_centros
-
-# regioes_desbalanceadas = [regiao for regiao in regioes.keys() \
-#     if (len(list(regioes[regiao].neighbors(regiao)))/demanda_ideal) <= 1]
-
-# for regiao in regioes_desbalanceadas:
-#     # print("Região desbalanceada: ", regiao)
-#     proximidades = [x for x in regioes.keys() \
-#         if (len(list(regioes[x].neighbors(x)))/demanda_ideal) > 1]
-    
-#     proximidades = sorted(proximidades, \
-#             key=lambda regiao_proxima: distancia(regiao_proxima, regiao))
-
-#     # print("Regiões próximas a ela: ", proximidades)
-#     regiao_proxima = proximidades.pop(0)
-
-#     clientes_proximos = sorted(regioes[regiao_proxima].neighbors(regiao_proxima), \
-#                         key=lambda cliente: distancia(cliente, regiao))
-
-#     # print("Clientes da região próxima (ordenados): ", clientes_proximos)
-#     # print()
-#     # for cliente_proximo in clientes_proximos:
-#     while True:
-#         cliente_proximo = clientes_proximos.pop(0)
-
-#         # print("Cliente a ser analisado: ", cliente_proximo)
-#         intersecao_clientes = [x for x in clientes_proximos \
-#             if x is not cliente_proximo and existe_intersecao(cliente_proximo, regiao, regiao_proxima, x)]
-
-#         # print("Interseções que o cliente possui: ", intersecao_clientes)
-
-#         if len(intersecao_clientes) > 0:
-#             if cliente_proximo is in intersecao_clientes:
-#                 clientes_proximos.append(cliente_proximo)
-#             continue
-
-#         regioes[regiao_proxima].remove_node(cliente_proximo)
-#         regioes[regiao].add_node(cliente_proximo)
-#         regioes[regiao].add_edge(cliente_proximo, regiao, distancia=distancia(regiao, cliente_proximo))
-
-#         if (len(list(regioes[regiao].neighbors(regiao))) / demanda_ideal) >= 1 \
-#             or (len(list(regioes[regiao_proxima].neighbors(regiao_proxima))) / demanda_ideal) == 1 \
-#             or len(clientes_proximos) == 0:
-#             break
-#     # break
-
 imprime_grafo(regioes, "exibicao/{0}com-melhoria.png".format(nome_arquivo), qtd_casas)
 
 # transforma em grafo completo
@@ -297,13 +192,9 @@ for centro in regioes.keys():
             if not grafo.has_edge(u, v) and not grafo.has_edge(v, u) and u is not v:
                 grafo.add_edge(u, v, distancia=distancia(u, v))
 
-
-
 # grafos completos estão dentro de regioes {}
 # lista de veículos estão dentro de veículos[]
 veiculos_melhorados = {}
-
-print("Veiculos: ", veiculos)
 
 for centro in regioes.keys():
     volume_temp = centro.volume / volume_total
@@ -315,14 +206,64 @@ for centro in regioes.keys():
 
     veiculos_melhorados[centro] = veiculos_temp
 
+grafo = nx.Graph()
 
-regiao = list(regioes.keys())[0]
-MontaCaminhos(regioes[regiao],veiculos_melhorados[regiao])
+# centros = list(regioes.keys())
 
-# em veículos melhorados, tem uma lista de carros proporcional
-# para cada veículo. Se quiser os veiculos para o centro Z, então
-# basta fazer veiculos_melhorados[Z] 
-regiao = list(regioes.keys())[0]
+# MontaCaminhos(regioes[centros[0]], veiculos_melhorados[centros[0]])
+# MontaCaminhos(regioes[centros[1]], veiculos_melhorados[centros[1]])
+# MontaCaminhos(regioes[centros[2]], veiculos_melhorados[centros[2]])
+# MontaCaminhos(regioes[centros[1]], veiculos_melhorados[centros[1]])
+# MontaCaminhos(regioes[centros[4]], veiculos_melhorados[centros[4]])
+
+total = 0
+
+for regiao in regioes.keys():
+    grafo.add_nodes_from(list(regioes[regiao].nodes()))
+
+    resultado = MontaCaminhos(regioes[regiao],veiculos_melhorados[regiao])
+
+    for caminho in resultado:
+        
+        km_percorrido = 0
+        tempo_percorrido = 0
+        veiculo_utilizado = None
+
+        for rota_temp in caminho.keys():
+            rota, veiculo = caminho[rota_temp]
+            
+            veiculo_utilizado = veiculo
+            
+            for i in range(len(rota)-1):
+                if i == 0:
+                    # contar o tempo gasto no descarregamento do centro ao primeiro cliente
+                    tempo_percorrido += veiculo.tc
+                else:
+                    # contar o tempo gasto no descarregamento de cliente para cliente
+                    tempo_percorrido += veiculo.td
+                
+                km_percorrido += distancia(rota[i], rota[i+1])
+                grafo.add_edge(rota[i], rota[i+1], distancia=distancia(rota[i], rota[i+1]))
 
 
-# só usar
+        # contar o tempo gasto no descarregamento de um cliente e volta para centro
+        tempo_percorrido += veiculo_utilizado.tc
+        km_percorrido += distancia(rota[0],rota[len(rota)-1])
+
+        tempo_percorrido += km_percorrido / veiculo_utilizado.vd
+
+        grafo.add_edge(rota[0], rota[len(rota)-1])
+
+        custo_por_km = km_percorrido * veiculo_utilizado.pkm
+        custo_por_hr = tempo_percorrido * veiculo_utilizado.ph
+        custo_fixo = veiculo_utilizado.pf
+
+        total_veiculo = custo_fixo + custo_por_hr + custo_por_km   
+        print("Tempo gasto: ", tempo_percorrido)
+        print("Rota com veículo ", veiculo_utilizado, " gastou: ", total_veiculo)
+
+        total += total_veiculo
+    
+print("Total de gastos: ", total)
+
+imprime_grafo_simples(grafo, "exibicao/rotas", qtd_casas)

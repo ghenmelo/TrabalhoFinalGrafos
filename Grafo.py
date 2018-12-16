@@ -40,12 +40,13 @@ def TSP (G,veiculo):
     #   Se ainda todas as condições forem satisfeitas, o TSPAux calcula 
     #uma nova trajetória 
     #   Caso o TSPAux retorne um caminho inválido,o G  recebe o valor da ultima itercação.
+
     while len(listaDeVisitados) != len(listaDeVertices) and somaVolume <= veiculo.V and somavalor <= veiculo.P and somaTempo<=7:
         temp = G.copy()
         tempLista = list(listaDeVisitados)
         G,listaDeVisitados =  TSPaux (G,listaDeVisitados)
+        
         for i in listaDeVisitados:
-            
             somavalor += G.node[i]["valor"]
             somaVolume += G.node[i]["volume"]
         if (len(listaDeVisitados) > 1):
@@ -114,12 +115,12 @@ def MontaCaminhos (G,veiculos):
 
     for veiculo in veiculos:
         melhoresVeiculos.append(veiculo)
-    melhoresVeiculos.sort(reverse=True, key=lambda veiculo:veiculo.calculaCustoBeneficio())
+    melhoresVeiculos.sort(reverse = True,key=lambda veiculo:veiculo.calculaCustoBeneficio())
     
     iteracao= 0
     
     # Enquanto o grafo tiver vertíces além do centro, é realizado o TSP para a determinação do caminho que o veículo utilizado
-    while N.size() != 1:
+    while N.size() != 0:
         k = 0
         for i in range (0,len(melhoresVeiculos)):
             if (melhoresVeiculos[i].Nv > 0):
@@ -137,6 +138,8 @@ def MontaCaminhos (G,veiculos):
         caminhos.append({iteracao+1:(caminhoAtual,melhoresVeiculos[k])})
         iteracao += 1
         veiculos[veiculos.index(melhoresVeiculos[k])].Nv -= 1
+
+    # print("Caminho: ", caminhos)
     return voltaOriginal(caminhos,P,G)
 
 
@@ -156,7 +159,7 @@ def criarGrafo (C):
             G.add_node(cont,volume=i.volume,valor=i.getValor(),numeroPacotes=i.pacotes,coordX=i.getX(),coordY=i.getY(),centro=i.centro,visitado = False)
             cont += 1
 
-    print ("numero de vertices :",len(list(G.nodes())))
+    # print ("numero de vertices :",len(list(G.nodes())))
 
     # Cria as arestas do grafo adaptado, comparando se o [i][j] == [u][v] respectivamente 
     # onde [i][j] são os indices dos vertices e [u][v] são os clientes
@@ -172,12 +175,9 @@ def criarGrafo (C):
                 if  u.volume == G.node[i]["volume"] and w == G.node[i]["valor"] and u.pacotes == G.node[i]["numeroPacotes"] and x == G.node[i]["coordX"] and y == G.node[i]["coordY"] and u.centro == G.node[i]["centro"]:
                     if  v.volume == G.node[j]["volume"] and w1 == G.node[j]["valor"] and v.pacotes == G.node[j]["numeroPacotes"] and x1 == G.node[j]["coordX"] and y1 == G.node[j]["coordY"] and v.centro == G.node[j]["centro"]:
                         G.add_edges_from([(i,j)],distancia = C[u][v]["distancia"],caminho = False)
-    print("Vértices: ", len(list(G.nodes())))
-    print("Arestas: ", len(list(G.edges())))
+    # print("Vértices: ", len(list(G.nodes())))
+    # print("Arestas: ", len(list(G.edges())))
     return G
-
-   
-    
 
 def voltaOriginal(caminho, G, grafoOriginal):
     listaCaminho = []
@@ -190,86 +190,6 @@ def voltaOriginal(caminho, G, grafoOriginal):
                     listaCaminho[k][k+1][0].append(j)
     return listaCaminho
     
-
-#     G = nx.Graph()
-#     G.add_nodes_from([1,2,3,4,5],visitado = False,valor = 0,volume = 0)
-#     G.add_edges_from([(1,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,4),(3,5),(4,5)],caminho = False)
-#     G[1][2]["distancia"] = 9
-#     G[1][3]["distancia"] = 6
-#     G[1][4]["distancia"] = 4
-#     G[1][5]["distancia"] = 1
-#     G[2][3]["distancia"] = 7
-#     G[2][4]["distancia"] = 3
-#     G[2][5]["distancia"] = 5
-#     G[3][4]["distancia"] = 8
-#     G[3][5]["distancia"] = 4
-#     G[4][5]["distancia"] = 2
-
-#     G.node[1]["valor"] = 0
-#     G.node[2]["valor"] = 200
-#     G.node[3]["valor"] = 300
-#     G.node[4]["valor"] = 150
-#     G.node[5]["valor"] = 50
-
-#     G.node[1]["numeroPacotes"]=0
-#     G.node[2]["numeroPacotes"]=3
-#     G.node[3]["numeroPacotes"]=2
-#     G.node[4]["numeroPacotes"]=1
-#     G.node[5]["numeroPacotes"]=6
-    
-
-#     G.node[1]["volume"] = 0
-#     G.node[2]["volume"] = 2
-#     G.node[3]["volume"] = 0.03
-#     G.node[4]["volume"] = 1
-#     G.node[5]["volume"] = 0.01    
-        
-# Lista de informações sobre os veículos
-# veiculos = [Veiculo(0, 0, 0, 25, 30, 0.01, 0, 0, 0, 0) for i in range(5)]
-# # Tipo 0: Van
-# veiculos[0].V = random.randint(8,16)
-# veiculos[0].P = random.randint(70000,75000)
-# veiculos[0].Nv = random.randint(10,20)
-# veiculos[0].td = random.uniform(0.04, 0.08)
-# veiculos[0].ph = random.randint(30,60)
-# veiculos[0].pkm = random.randint(2,4)
-# veiculos[0].pf = random.randint(100,200)
-# # Tipo 1: Mini-Van
-# veiculos[1].V = random.randint(2,4)
-# veiculos[1].P = random.randint(70000,75000)
-# veiculos[1].Nv = random.randint(10,20)
-# veiculos[1].td = random.uniform(0.02, 0.04)
-# veiculos[1].ph = random.randint(30,60)
-# veiculos[1].pkm = random.randint(2,4)
-# veiculos[1].pf = random.randint(90,180)
-# # Tipo 2: Comum
-# veiculos[2].V = random.uniform(0.7,1.4)
-# veiculos[2].P = random.randint(30000,35000)
-# veiculos[2].Nv = random.randint(20,30)
-# veiculos[2].td = random.uniform(0.02, 0.04)
-# veiculos[2].ph = random.randint(30,60)
-# veiculos[2].pkm = random.randint(1,2)
-# veiculos[2].pf = random.randint(60,120)
-# # Tipo 3: Motocicleta
-# veiculos[3].V = random.uniform(0.02,0.04)
-# veiculos[3].P = random.randint(1000,5000)
-# veiculos[3].Nv = random.randint(2,2)
-# veiculos[3].td = random.uniform(0.02, 0.04)
-# veiculos[3].ph = random.randint(30,60)
-# veiculos[3].pkm = random.randint(1,2)
-# veiculos[3].pf = random.randint(40,80)
-# # Tipo 4: Van terceirizada
-# veiculos[4].V = random.uniform(0.08,0.16)
-# veiculos[4].P = random.randint(75000,80000)
-# veiculos[4].Nv = 100
-# veiculos[4].td = random.uniform(0.04, 0.08)
-# veiculos[4].ph = 0
-# veiculos[4].pkm = random.randint(2,4)
-# veiculos[4].pf = 0
-# for i in veiculos:
-#     print(i.calculaCustoBeneficio())
-# for i in veiculos:
-#     print(i.Nv)
 
 
 
