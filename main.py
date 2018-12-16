@@ -15,7 +15,6 @@ def intersecao(centro, cliente, centro1, cliente1):
     return det != 0
 
 def existe_intersecao(centro, cliente, centro1, cliente1):
-    # print("({0},{1}), ({2},{3}), ({4},{5}), ({6},{7})".format(centro.getX(), centro.getY(), cliente.getX(), cliente.getY(), centro1.getX(), centro1.getY(), cliente1.getX(), cliente1.getY()))
     return ((centro.getY() >= centro1.getY()) == (cliente.getY() <= cliente1.getY())) and ((centro.getY() <= centro1.getY()) == (cliente.getY() >= cliente1.getY()))
 
 
