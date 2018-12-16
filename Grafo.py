@@ -5,8 +5,13 @@ import random
 
 #Função que calcula o tempo da trajetória que determinado veículo fez
 def CalculaTempo(listaDeVisitados, veiculo, G):
-    tempoInicial = veiculo.tc
+    tempoInicial = 0 
+    for i in listaDeVisitados:
+        if i != listaDeVisitados[0]:
+            tempoInicial += G[i]["numeroPacotes"]*veiculo.tc
+
     tempoDescarga = 0
+
     for v in listaDeVisitados:
         if v != listaDeVisitados[0]:
            tempoDescarga += G.node[v]["numeroPacotes"]*veiculo.td
@@ -49,8 +54,17 @@ def TSP (G,veiculo):
         for i in listaDeVisitados:
             somavalor += G.node[i]["valor"]
             somaVolume += G.node[i]["volume"]
+
         if (len(listaDeVisitados) > 1):
             somaTempo = CalculaTempo(listaDeVisitados,veiculo,G)
+        if len(listaDeVisitados) == 1:
+            if somavalor > veiculo.P:
+                motivo = "Valor"
+            if somaVolume > veiculo.V :
+                motivo = "Volume"
+            if (somaTempo > 7):
+                motivo = "Tempo"
+
     if  somaVolume > veiculo.V or somavalor > veiculo.P or somaTempo>7:
         G = temp
         listaDeVisitados = tempLista
@@ -60,7 +74,7 @@ def TSP (G,veiculo):
     for i in listaDeVisitados:
         if (i != verticeInicial):
             G.remove_node(i)
-    return G,listaDeVisitados
+    return G,listaDeVisitados,motivo
 
 
 # Função que realiza o TSP do vizinho mais proximo
@@ -138,8 +152,12 @@ def MontaCaminhos (G,veiculos):
         caminhos.append({iteracao+1:(caminhoAtual,melhoresVeiculos[k])})
         iteracao += 1
         veiculos[veiculos.index(melhoresVeiculos[k])].Nv -= 1
+<<<<<<< HEAD
+    print (caminhos)
+=======
 
     # print("Caminho: ", caminhos)
+>>>>>>> 989c22fa1aac02fa7b3eaadf0ae4db9a06fb5399
     return voltaOriginal(caminhos,P,G)
 
 
