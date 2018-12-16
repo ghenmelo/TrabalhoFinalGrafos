@@ -4,6 +4,8 @@ import math
 import random
 import matplotlib.pyplot as a
 import matplotlib as mpl
+import copy
+from Grafo import MontaCaminhos
 
 from modelo.clientes import Cliente
 from modelo.veiculo import Veiculo
@@ -131,28 +133,37 @@ nx.draw_spring(completo, node_color = color_map)
 a.savefig("completo.png")
 
 # transforma em grafo completo
-# for centro in regioes.keys():
-#     # pega os clientes do centro
-#     grafo = regioes[centro]
-#     clientes_adjacentes = list(grafo.neighbors(centro))
+for centro in regioes.keys():
+    # pega os clientes do centro
+    grafo = regioes[centro]
+    clientes_adjacentes = list(grafo.nodes())
 
-#     for u in clientes_adjacentes:
-#         for v in clientes_adjacentes:
-#             grafo.add_edge(u, v, distancia=distancia(u, v))
+    for u in clientes_adjacentes:
+        for v in clientes_adjacentes:
+            if not grafo.has_edge(u, v) and not grafo.has_edge(v, u) and u is not v:
+                grafo.add_edge(u, v, distancia=distancia(u, v))
+
+
 
 # grafos completos estão dentro de regioes {}
 # lista de veículos estão dentro de veículos[]
 veiculos_melhorados = {}
 
+print("Veiculos: ", veiculos)
+
 for centro in regioes.keys():
     volume_temp = centro.volume / volume_total
 
-    veiculos_temp = list(veiculos)
+    veiculos_temp = [copy.copy(x) for x in veiculos]
 
     for veiculo in veiculos_temp:
-        veiculo.Nv *= volume_temp
+        veiculo.Nv = math.floor(veiculo.Nv * volume_temp)
 
     veiculos_melhorados[centro] = veiculos_temp
+
+
+regiao = list(regioes.keys())[0]
+MontaCaminhos(regioes[regiao],veiculos_melhorados[regiao])
 
 # em veículos melhorados, tem uma lista de carros proporcional
 # para cada veículo. Se quiser os veiculos para o centro Z, então

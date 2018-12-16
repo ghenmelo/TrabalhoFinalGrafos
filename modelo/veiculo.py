@@ -31,5 +31,7 @@ class Veiculo(object):
     def calculaCustoBeneficio(self):
         return ((self.ph+self.pkm+self.pf) / (self.V))
         
+    def __repr__(self):
+        return "({0}, {1})".format(self.V, self.Nv)
 
     
