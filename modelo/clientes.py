@@ -13,11 +13,6 @@ class Cliente(object):
 
     def getValor(self):
         return self.__valor
-<<<<<<< HEAD
-
-        
-=======
->>>>>>> 989c22fa1aac02fa7b3eaadf0ae4db9a06fb5399
 
     def getX(self):
         return self.__coordX  

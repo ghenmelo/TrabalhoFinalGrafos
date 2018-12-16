@@ -1,20 +1,19 @@
 import networkx as nx
 from modelo.veiculo import Veiculo
 import random
-#PRECISA COLOCAR A QUESTAO DO TEMPO QUE O VEICULO CIRCULA
 
 #Função que calcula o tempo da trajetória que determinado veículo fez
 def CalculaTempo(listaDeVisitados, veiculo, G):
     tempoInicial = 0 
     for i in listaDeVisitados:
         if i != listaDeVisitados[0]:
-            tempoInicial += G[i]["numeroPacotes"]*veiculo.tc
+            tempoInicial += G.node[i]["numeroDePacotes"]*veiculo.tc
 
     tempoDescarga = 0
 
     for v in listaDeVisitados:
         if v != listaDeVisitados[0]:
-           tempoDescarga += G.node[v]["numeroPacotes"]*veiculo.td
+           tempoDescarga += G.node[v]["numeroDePacotes"]*veiculo.td
     
     tempoLocomocao = 0
     # Faz a soma dos tempos de locomoção
@@ -45,7 +44,7 @@ def TSP (G,veiculo):
     #   Se ainda todas as condições forem satisfeitas, o TSPAux calcula 
     #uma nova trajetória 
     #   Caso o TSPAux retorne um caminho inválido,o G  recebe o valor da ultima itercação.
-
+    motivo = ""
     while len(listaDeVisitados) != len(listaDeVertices) and somaVolume <= veiculo.V and somavalor <= veiculo.P and somaTempo<=7:
         temp = G.copy()
         tempLista = list(listaDeVisitados)
@@ -57,13 +56,18 @@ def TSP (G,veiculo):
 
         if (len(listaDeVisitados) > 1):
             somaTempo = CalculaTempo(listaDeVisitados,veiculo,G)
+        print(len(listaDeVisitados))
         if len(listaDeVisitados) == 1:
             if somavalor > veiculo.P:
                 motivo = "Valor"
-            if somaVolume > veiculo.V :
+            elif somaVolume > veiculo.V :
                 motivo = "Volume"
-            if (somaTempo > 7):
+            elif (somaTempo > 7):
                 motivo = "Tempo"
+            else:
+                motivo = "Desconhecido"
+
+            print("Motivo fornecido: ", motivo)
 
     if  somaVolume > veiculo.V or somavalor > veiculo.P or somaTempo>7:
         G = temp
@@ -123,6 +127,7 @@ def MontaCaminhos (G,veiculos):
     N = P.copy()
     caminhos = []
     melhoresVeiculos = []
+    
     N.node[1]["volume"] = 0
     N.node[1]["valor"] = 0
     N.node[1]["numeroDePacotes"] = 0
@@ -132,7 +137,6 @@ def MontaCaminhos (G,veiculos):
     melhoresVeiculos.sort(reverse = True,key=lambda veiculo:veiculo.calculaCustoBeneficio())
     
     iteracao= 0
-    
     # Enquanto o grafo tiver vertíces além do centro, é realizado o TSP para a determinação do caminho que o veículo utilizado
     while N.size() != 0:
         k = 0
@@ -141,23 +145,29 @@ def MontaCaminhos (G,veiculos):
                 k = i
                 break
         caminhoAtual = []
-        N,caminhoAtual = TSP(N,melhoresVeiculos[0])
+        N,caminhoAtual,motivo = TSP(N,melhoresVeiculos[0])
         # while utilizado para a mudança de veículo caso o atual não suporte o volume ou o valor da entrega
         while len(caminhoAtual) == 1 :
             k += 1
             if k == 5:
-                raise Exception("Não foi possível resolver")
+                # print("Onde estou?",k)
+                if k == 5  and melhoresVeiculos[k-1].Nv == 0:
+                    raise Exception("Não foi possível resolver por causa do numero de carros")
+                elif (motivo == "Volume"):
+                    raise Exception("Não foi possível resolver por causa do volume")
+                elif (motivo == "Valor"):
+                    raise Exception("Não foi possível resolver por causa do valor")
+                elif (motivo == "Tempo"):
+                    raise Exception("Não foi possível resolver por causa do tempo")
+                elif (motivo == "Desconhecido"):
+                    raise Exception ("Desconhecido")
             if melhoresVeiculos[k].Nv > 0:
-                N,caminhoAtual = TSP(N,melhoresVeiculos[k])
+                N,caminhoAtual,motivo = TSP(N,melhoresVeiculos[k])
         caminhos.append({iteracao+1:(caminhoAtual,melhoresVeiculos[k])})
         iteracao += 1
         veiculos[veiculos.index(melhoresVeiculos[k])].Nv -= 1
-<<<<<<< HEAD
-    print (caminhos)
-=======
 
-    # print("Caminho: ", caminhos)
->>>>>>> 989c22fa1aac02fa7b3eaadf0ae4db9a06fb5399
+
     return voltaOriginal(caminhos,P,G)
 
 
@@ -171,10 +181,10 @@ def criarGrafo (C):
     for i in C.nodes():
         if(i.centro == True):
             
-            G.add_node(1,volume=i.volume,valor=i.getValor(),numeroPacotes=i.pacotes,coordX=i.getX(),coordY=i.getY(),centro=i.centro,visitado = False)
+            G.add_node(1,volume=i.volume,valor=i.getValor(),numeroDePacotes=i.pacotes,coordX=i.getX(),coordY=i.getY(),centro=i.centro,visitado = False)
         
         else:
-            G.add_node(cont,volume=i.volume,valor=i.getValor(),numeroPacotes=i.pacotes,coordX=i.getX(),coordY=i.getY(),centro=i.centro,visitado = False)
+            G.add_node(cont,volume=i.volume,valor=i.getValor(),numeroDePacotes=i.pacotes,coordX=i.getX(),coordY=i.getY(),centro=i.centro,visitado = False)
             cont += 1
 
     # print ("numero de vertices :",len(list(G.nodes())))
@@ -190,8 +200,8 @@ def criarGrafo (C):
                 w1 = v.getValor()
                 x1 = v.getX()
                 y1 = v.getY()
-                if  u.volume == G.node[i]["volume"] and w == G.node[i]["valor"] and u.pacotes == G.node[i]["numeroPacotes"] and x == G.node[i]["coordX"] and y == G.node[i]["coordY"] and u.centro == G.node[i]["centro"]:
-                    if  v.volume == G.node[j]["volume"] and w1 == G.node[j]["valor"] and v.pacotes == G.node[j]["numeroPacotes"] and x1 == G.node[j]["coordX"] and y1 == G.node[j]["coordY"] and v.centro == G.node[j]["centro"]:
+                if  u.volume == G.node[i]["volume"] and w == G.node[i]["valor"] and u.pacotes == G.node[i]["numeroDePacotes"] and x == G.node[i]["coordX"] and y == G.node[i]["coordY"] and u.centro == G.node[i]["centro"]:
+                    if  v.volume == G.node[j]["volume"] and w1 == G.node[j]["valor"] and v.pacotes == G.node[j]["numeroDePacotes"] and x1 == G.node[j]["coordX"] and y1 == G.node[j]["coordY"] and v.centro == G.node[j]["centro"]:
                         G.add_edges_from([(i,j)],distancia = C[u][v]["distancia"],caminho = False)
     # print("Vértices: ", len(list(G.nodes())))
     # print("Arestas: ", len(list(G.edges())))
@@ -204,28 +214,6 @@ def voltaOriginal(caminho, G, grafoOriginal):
         listaCaminho.append({k+1:([],caminho[k][k+1][1])})
         for i in caminho[k][k+1][0]:
             for j in grafoOriginal.nodes():
-                if  j.volume == G.node[i]["volume"] and j.getValor() == G.node[i]["valor"] and j.pacotes == G.node[i]["numeroPacotes"] and j.getX() == G.node[i]["coordX"] and j.getY() == G.node[i]["coordY"] and j.centro == G.node[i]["centro"]:
+                if  j.volume == G.node[i]["volume"] and j.getValor() == G.node[i]["valor"] and j.pacotes == G.node[i]["numeroDePacotes"] and j.getX() == G.node[i]["coordX"] and j.getY() == G.node[i]["coordY"] and j.centro == G.node[i]["centro"]:
                     listaCaminho[k][k+1][0].append(j)
     return listaCaminho
-    
-
-
-
-
-    
-
-    
-        
-        
-            
-
-
-            
-
-        
-
-
-
-
-
-
